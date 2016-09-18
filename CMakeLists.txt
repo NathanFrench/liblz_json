@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 include_directories (${PROJECT_BINARY_DIR}/include)
+include_directories (${PROJECT_BINARY_DIR}/include/liblz)
 link_directories    (${PROJECT_BINARY_DIR}/lib)
 
 find_library (LIBLZ_CORE      liblz_core)
