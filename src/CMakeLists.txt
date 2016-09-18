@@ -1,5 +1,5 @@
 add_library           (lz_json ${LIBLZ_OBJ_TYPE} lz_json.c)
-target_link_libraries (lz_json lz_tailq lz_kvmap)
+target_link_libraries (lz_json lz_core)
 
 install               (TARGETS lz_json DESTINATION lib)
 install               (FILES lz_json.h DESTINATION include/liblz)
