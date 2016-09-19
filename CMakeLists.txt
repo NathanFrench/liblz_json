@@ -1,17 +1,11 @@
 cmake_minimum_required(VERSION 2.8)
 
-include_directories (${PROJECT_BINARY_DIR}/include)
-include_directories (${PROJECT_BINARY_DIR}/include/liblz)
-link_directories    (${PROJECT_BINARY_DIR}/lib)
+include_directories (${CMAKE_BINARY_DIR}/include)
+include_directories (${CMAKE_BINARY_DIR}/include/liblz)
+link_directories    (${CMAKE_BINARY_DIR}/lib)
 
-find_library (LIBLZ_CORE      liblz_core)
-find_path    (LIBLZ_CORE_PATH liblz/lzapi.h)
-
-if (LIBLZ_CORE)
-	if (LIBLZ_CORE_PATH)
-		include_directories (${LIBLZ_CORE_PATH}})
-	endif ()
-endif ()
+find_library (LIBLZ_CORE lz_core)
+message      (STATUS "lzcore: ${LIBLZ_CORE}")
 
 find_library (LIBLUA
 	NAMES
