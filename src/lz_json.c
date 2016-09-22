@@ -42,6 +42,16 @@ typedef enum lz_j_obj_state lz_j_obj_state;
 
 static __thread void * __js_heap = NULL;
 
+struct __jbuf {
+    char  * buf;
+    size_t  buf_idx;
+    size_t  buf_len;
+    ssize_t written;
+    int     dynamic;
+    bool    escape;
+};
+
+
 struct lz_json_s {
     lz_json_vtype type;
     union {
@@ -55,6 +65,12 @@ struct lz_json_s {
     size_t slen;
     void   (* freefn)(void *);
 };
+
+static lz_json * js_parse_value_(const char *, size_t, size_t *);
+static int       js_compare_(lz_json *, lz_json *, lz_json_key_filtercb);
+
+static int       js_json_to_buffer_(lz_json * json, struct __jbuf * jbuf);
+static int       js_addbuf_(struct __jbuf * jbuf, const char * buf, size_t len);
 
 #define JS_STATIC_GET_FNDEF(return_type, return_err, arg_cmp, arg_name) \
     static return_type                                                  \
@@ -504,7 +520,7 @@ js_parse_boolean_(const char * data, size_t len, size_t * n_read)
     if (lz_unlikely(len < 4))
     {
         /* need at LEAST 'true' */
-	*n_read = 0;
+        *n_read = 0;
         return NULL;
     }
 
@@ -567,40 +583,6 @@ js_parse_null_(const char * data, size_t len, size_t * n_read)
     *n_read += 4;
 
     return js_null_new_();
-}
-
-static lz_json *
-js_parse_value_(const char * data, size_t len, size_t * n_read)
-{
-    if (data == NULL || len == 0)
-    {
-        return NULL;
-    }
-
-    switch (data[0]) {
-        case '"':
-            return js_parse_string_(data, len, n_read);
-        case '{':
-            return js_parse_object_(data, len, n_read);
-        case '[':
-            return js_parse_array_(data, len, n_read);
-        default:
-            if (isdigit(data[0]))
-            {
-                return js_parse_number_(data, len, n_read);
-            }
-
-            switch (*data) {
-                case 't':
-                case 'f':
-                    return js_parse_boolean_(data, len, n_read);
-                case 'n':
-                    return js_parse_null_(data, len, n_read);
-            }
-    } /* switch */
-
-    /* *n_read = 0; */
-    return NULL;
 }
 
 static lz_json *
@@ -697,7 +679,7 @@ end:
     }
 
     return js;
-} /* lz_json_parse_array */
+} /* js_parse_array_ */
 
 static lz_json *
 js_parse_object_(const char * data, size_t len, size_t * n_read)
@@ -889,7 +871,7 @@ js_parse_buf_(const char * data, size_t len, size_t * n_read)
     *n_read += i;
 
     return js;
-}         /* lz_json_parse_buf */
+} /* js_parse_buf_ */
 
 static lz_json *
 js_parse_file_(const char * filename, size_t * bytes_read)
@@ -1097,18 +1079,6 @@ js_add_(lz_json * obj, const char * key, lz_json * val)
 
     return js_object_add_(obj, key, val);
 }
-
-struct __jbuf {
-    char  * buf;
-    size_t  buf_idx;
-    size_t  buf_len;
-    ssize_t written;
-    int     dynamic;
-    bool    escape;
-};
-
-static int js_addbuf_(struct __jbuf * jbuf, const char * buf, size_t len);
-static int js_json_to_buffer_(lz_json * json, struct __jbuf * jbuf);
 
 static int
 js_addbuf_vprintf_(struct __jbuf * jbuf, const char * fmt, va_list ap)
@@ -1325,7 +1295,7 @@ js_string_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 
     str = json->string;
 
-    if ((str = json->string) == NULL) {
+    if ((str = json->string) == NULL)
     {
         return -1;
     }
@@ -1510,6 +1480,40 @@ js_object_to_buffer_(lz_json * json, struct __jbuf * jbuf)
     return 0;
 } /* js_object_to_buffer_ */
 
+static lz_json *
+js_parse_value_(const char * data, size_t len, size_t * n_read)
+{
+    if (data == NULL || len == 0)
+    {
+        return NULL;
+    }
+
+    switch (data[0]) {
+        case '"':
+            return js_parse_string_(data, len, n_read);
+        case '{':
+            return js_parse_object_(data, len, n_read);
+        case '[':
+            return js_parse_array_(data, len, n_read);
+        default:
+            if (isdigit(data[0]))
+            {
+                return js_parse_number_(data, len, n_read);
+            }
+
+            switch (*data) {
+                case 't':
+                case 'f':
+                    return js_parse_boolean_(data, len, n_read);
+                case 'n':
+                    return js_parse_null_(data, len, n_read);
+            }
+    } /* switch */
+
+    /* *n_read = 0; */
+    return NULL;
+}
+
 static int
 js_json_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 {
@@ -1580,8 +1584,6 @@ js_to_buffer_alloc_(lz_json * json, size_t * len)
 
     return jbuf.buf;
 }
-
-static int js_compare_(lz_json *, lz_json *, lz_json_key_filtercb);
 
 static int
 js_number_compare_(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb)
