@@ -23,7 +23,7 @@ typedef int (*lz_json_key_filtercb)(const char * key, lz_json * val);
  *
  * @return lz_json context with a vtype of 'lz_json_vtype_object'
  */
-LZ_EXPORT lz_json * lz_json_new_object(void);
+LZ_EXPORT lz_json * lz_json_object_new(void);
 
 
 /**
@@ -31,7 +31,7 @@ LZ_EXPORT lz_json * lz_json_new_object(void);
  *
  * @return lz_json context with a vtype of 'lz_json_vtype_array'
  */
-LZ_EXPORT lz_json * lz_json_new_array(void);
+LZ_EXPORT lz_json * lz_json_array_new(void);
 
 
 /**
@@ -208,7 +208,7 @@ LZ_EXPORT bool lz_json_get_boolean(lz_json * js);
  *
  * @return 1 if null, -1 if underlying data is not a null
  */
-LZ_EXPORT char lz_json_get_null(lz_json * js);
+LZ_EXPORT int lz_json_get_null(lz_json * js);
 
 
 /**
@@ -304,6 +304,7 @@ LZ_EXPORT int lz_json_add(lz_json * obj, const char * k, lz_json * val);
 LZ_EXPORT ssize_t lz_json_to_buffer(lz_json * json, char * buf, size_t buf_len);
 
 
+#if 0
 /**
  * @brief same as lz_json_to_buffer but does not escape strings
  *
@@ -314,6 +315,7 @@ LZ_EXPORT ssize_t lz_json_to_buffer(lz_json * json, char * buf, size_t buf_len);
  * @return
  */
 LZ_EXPORT ssize_t lz_json_to_buffer_nescp(lz_json * json, char * buf, size_t buf_len);
+#endif
 
 
 /**

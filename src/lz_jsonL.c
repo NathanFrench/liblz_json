@@ -17,10 +17,12 @@
 #include "lz_jsonL.h"
 
 static int
-_lz_j_number_to_lua(lz_json * json, lua_State * L) {
+js_number_to_lua_(lz_json * json, lua_State * L)
+{
     lz_assert(L != NULL);
 
-    if (lz_json_get_type(json) != lz_json_vtype_number) {
+    if (lz_json_get_type(json) != lz_json_vtype_number)
+    {
         return -1;
     }
 
@@ -30,7 +32,8 @@ _lz_j_number_to_lua(lz_json * json, lua_State * L) {
 }
 
 static int
-_lz_j_array_to_lua(lz_json * json, lua_State * L) {
+js_array_to_lua_(lz_json * json, lua_State * L)
+{
     int             index;
     lz_tailq      * array;
     lz_tailq_elem * elem;
@@ -38,7 +41,8 @@ _lz_j_array_to_lua(lz_json * json, lua_State * L) {
 
     lz_assert(L != NULL);
 
-    if (!(array = lz_json_get_array(json))) {
+    if (!(array = lz_json_get_array(json)))
+    {
         return -1;
     }
 
@@ -46,12 +50,14 @@ _lz_j_array_to_lua(lz_json * json, lua_State * L) {
 
     lua_createtable(L, lz_tailq_size(array), 0);
 
-    for (elem = lz_tailq_first(array); elem; elem = temp) {
+    for (elem = lz_tailq_first(array); elem; elem = temp)
+    {
         lz_json * val;
 
-        val = (lz_json*)lz_tailq_elem_data(elem);
+        val = (lz_json *)lz_tailq_elem_data(elem);
 
-        if (val) {
+        if (val)
+        {
             lua_pushnumber(L, index++);
             lz_json_to_lua(val, L);
             lua_settable(L, -3);
@@ -64,28 +70,32 @@ _lz_j_array_to_lua(lz_json * json, lua_State * L) {
 }
 
 static int
-_lz_j_object_to_lua(lz_json * json, lua_State * L) {
+js_object_to_lua_(lz_json * json, lua_State * L)
+{
     lz_kvmap     * object;
     lz_kvmap_ent * ent;
     lz_kvmap_ent * temp;
 
     lz_assert(L != NULL);
 
-    if (!(object = lz_json_get_object(json))) {
+    if (!(object = lz_json_get_object(json)))
+    {
         return -1;
     }
 
     lua_createtable(L, 0, lz_kvmap_get_size(object));
 
 
-    for (ent = lz_kvmap_first(object); ent; ent = temp) {
+    for (ent = lz_kvmap_first(object); ent; ent = temp)
+    {
         const char * key;
         lz_json    * val;
 
         key = lz_kvmap_ent_key(ent);
         val = lz_kvmap_ent_val(ent);
 
-        if (val) {
+        if (val)
+        {
             lua_pushlstring(L, key, lz_kvmap_ent_get_klen(ent));
             lz_json_to_lua(val, L);
             lua_settable(L, -3);
@@ -98,12 +108,14 @@ _lz_j_object_to_lua(lz_json * json, lua_State * L) {
 }
 
 static int
-_lz_j_string_to_lua(lz_json * json, lua_State * L) {
+js_string_to_lua_(lz_json * json, lua_State * L)
+{
     const char * str;
 
     lz_assert(L != NULL);
 
-    if (!(str = lz_json_get_string(json))) {
+    if (!(str = lz_json_get_string(json)))
+    {
         return -1;
     }
 
@@ -112,31 +124,9 @@ _lz_j_string_to_lua(lz_json * json, lua_State * L) {
     return 0;
 }
 
-int
-lz_json_to_lua(lz_json * json, lua_State * L) {
-    if (!json || !L) {
-        return -1;
-    }
-
-    switch (lz_json_get_type(json)) {
-        case lz_json_vtype_number:
-            return _lz_j_number_to_lua(json, L);
-        case lz_json_vtype_array:
-            return _lz_j_array_to_lua(json, L);
-        case lz_json_vtype_object:
-            return _lz_j_object_to_lua(json, L);
-        case lz_json_vtype_string:
-            return _lz_j_string_to_lua(json, L);
-        default:
-            lua_pushnil(L);
-            return -1;
-    }
-
-    return 0;
-}
-
 static lz_json *
-_lz_j_from_lua_idx(lua_State * L, int idx) {
+js_from_lua_idx_(lua_State * L, int idx)
+{
     lz_json * parent = NULL;
 
     /* T X, let idx = -2 */
@@ -144,7 +134,8 @@ _lz_j_from_lua_idx(lua_State * L, int idx) {
     /* T X NIL */
     lua_pushnil(L);
 
-    while (lua_next(L, /* -2 */ idx - 1)) {
+    while (lua_next(L, /* -2 */ idx - 1))
+    {
         lz_json    * ent;
         int          key_type;
         int          val_type;
@@ -153,13 +144,14 @@ _lz_j_from_lua_idx(lua_State * L, int idx) {
         key_type = lua_type(L, -2);
         val_type = lua_type(L, -1);
 
-        if (parent == NULL) {
+        if (parent == NULL)
+        {
             switch (key_type) {
                 case LUA_TNUMBER:
-                    parent = lz_json_new_array();
+                    parent = lz_json_array_new();
                     break;
                 case LUA_TSTRING:
-                    parent = lz_json_new_object();
+                    parent = lz_json_object_new();
                     break;
                 default:
                     return NULL;
@@ -174,7 +166,7 @@ _lz_j_from_lua_idx(lua_State * L, int idx) {
                 ent = lz_json_string_new(lua_tostring(L, -1));
                 break;
             case LUA_TTABLE:
-                ent = _lz_j_from_lua_idx(L, -1);
+                ent = js_from_lua_idx_(L, -1);
                 break;
             default:
                 ent = NULL;
@@ -183,13 +175,15 @@ _lz_j_from_lua_idx(lua_State * L, int idx) {
 
         lua_pop(L, 1);
 
-        if (ent == NULL) {
+        if (ent == NULL)
+        {
             continue;
         }
 
         val_type = lua_type(L, -1);
 
-        if (val_type == LUA_TSTRING) {
+        if (val_type == LUA_TSTRING)
+        {
             key = lua_tostring(L, -1);
         }
 
@@ -197,23 +191,52 @@ _lz_j_from_lua_idx(lua_State * L, int idx) {
     }
 
     return parent;
-} /* _lz_j_from_lua_idx */
+} /* js_from_lua_idx_ */
 
 static lz_json *
-_lz_j_from_lua(lua_State * L) {
-    if (L == NULL) {
+_lz_j_from_lua(lua_State * L)
+{
+    if (L == NULL)
+    {
         return NULL;
     }
 
-    if (lua_type(L, -1) != LUA_TTABLE) {
+    if (lua_type(L, -1) != LUA_TTABLE)
+    {
         return NULL;
     }
 
-    return _lz_j_from_lua_idx(L, -1);
+    return js_from_lua_idx_(L, -1);
+}
+
+int
+lz_json_to_lua(lz_json * json, lua_State * L)
+{
+    if (!json || !L)
+    {
+        return -1;
+    }
+
+    switch (lz_json_get_type(json)) {
+        case lz_json_vtype_number:
+            return js_number_to_lua_(json, L);
+        case lz_json_vtype_array:
+            return js_array_to_lua_(json, L);
+        case lz_json_vtype_object:
+            return js_object_to_lua_(json, L);
+        case lz_json_vtype_string:
+            return js_string_to_lua_(json, L);
+        default:
+            lua_pushnil(L);
+            return -1;
+    }
+
+    return 0;
 }
 
 lz_json *
-lz_json_from_lua(lua_State * L) {
+lz_json_from_lua(lua_State * L)
+{
     return _lz_j_from_lua(L);
 }
 
