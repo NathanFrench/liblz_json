@@ -130,11 +130,7 @@ js_new_(lz_json_vtype type)
 {
     lz_json * lz_j;
 
-    if (lz_unlikely(__js_heap == NULL))
-    {
-        __js_heap = lz_heap_new(sizeof(lz_json), 1024);
-    }
-
+    /* if lz_json_init() was never called, this leads to bad things! */
     if (!(lz_j = lz_heap_alloc(__js_heap)))
     {
         return NULL;
@@ -302,7 +298,7 @@ js_object_add_(lz_json * dst, const char * key, lz_json * val)
         return -1;
     }
 
-    if (lz_unlikely(dst->type != lz_json_vtype_object))
+    if (dst->type != lz_json_vtype_object)
     {
         return -1;
     }
@@ -583,23 +579,23 @@ js_parse_value_(const char * data, size_t len, size_t * n_read)
 
     switch (data[0]) {
         case '"':
-            return lz_json_parse_string(data, len, n_read);
+            return js_parse_string_(data, len, n_read);
         case '{':
-            return lz_json_parse_object(data, len, n_read);
+            return js_parse_object_(data, len, n_read);
         case '[':
-            return lz_json_parse_array(data, len, n_read);
+            return js_parse_array_(data, len, n_read);
         default:
             if (isdigit(data[0]))
             {
-                return lz_json_parse_number(data, len, n_read);
+                return js_parse_number_(data, len, n_read);
             }
 
             switch (*data) {
                 case 't':
                 case 'f':
-                    return lz_json_parse_boolean(data, len, n_read);
+                    return js_parse_boolean_(data, len, n_read);
                 case 'n':
-                    return lz_json_parse_null(data, len, n_read);
+                    return js_parse_null_(data, len, n_read);
             }
     } /* switch */
 
@@ -859,7 +855,7 @@ js_parse_buf_(const char * data, size_t len, size_t * n_read)
             case lz_j_s_start:
                 switch (ch) {
                     case '{':
-                        if (!(js = lz_json_parse_object(&data[i], (len - i), &b_read)))
+                        if (!(js = js_parse_object_(&data[i], (len - i), &b_read)))
                         {
                             *n_read += b_read;
                             return NULL;
@@ -869,7 +865,7 @@ js_parse_buf_(const char * data, size_t len, size_t * n_read)
                         b_read = 0;
                         break;
                     case '[':
-                        if (!(js = lz_json_parse_array(&data[i], (len - i), &b_read)))
+                        if (!(js = js_parse_array_(&data[i], (len - i), &b_read)))
                         {
                             *n_read += b_read;
                             return NULL;
@@ -951,7 +947,7 @@ js_parse_file_(const char * filename, size_t * bytes_read)
             file_size     += 1;
         }
 
-        if (!(json = lz_json_parse_buf(buf, file_size, &n_read)))
+        if (!(json = js_parse_buf_(buf, file_size, &n_read)))
         {
             break;
         }
@@ -1022,6 +1018,9 @@ js_get_path_(lz_json * js, const char * path)
                         break;
                     case '\0':
                     case '.':
+                        /* XXX: if there is a failed allocation, this might
+                         *      leak memory from `object`
+                         */
                         if (!(object = js_get_object_(prev)))
                         {
                             return NULL;
@@ -1044,10 +1043,14 @@ js_get_path_(lz_json * js, const char * path)
             case path_state_reading_array:
                 switch (ch) {
                     case ']':
-                        if (!(prev = js_get_array_index_(prev, lz_atoi(buf, buf_idx))))
+                        prev = js_get_array_index_(prev,
+                                                   lz_atoi(buf, buf_idx));
+
+                        if (prev == NULL)
                         {
                             return NULL;
                         }
+
 
                         buf[0]         = '\0';
                         buf_idx        = 0;
@@ -1058,12 +1061,12 @@ js_get_path_(lz_json * js, const char * path)
                         buf[buf_idx++] = ch;
                         buf[buf_idx]   = '\0';
                         break;
-                }
+                } /* switch */
                 break;
             case path_state_reading_array_end:
                 state = path_state_reading_key;
                 break;
-        } /* switch */
+        }         /* switch */
 
         if (ch == '\0')
         {
@@ -1163,7 +1166,8 @@ js_addbuf_(struct __jbuf * jbuf, const char * buf, size_t len)
 
     if ((jbuf->buf_idx + len) > jbuf->buf_len)
     {
-        if (lz_unlikely(jbuf->dynamic == 1))
+        /* should we allocate this buffer ourselves? If so, let it roll! */
+        if (jbuf->dynamic == 1)
         {
             /* give daddy a little more memory, just one memory */
             jbuf->buf = reallocf(jbuf->buf, (size_t)(jbuf->buf_len + len + 32));
@@ -1236,12 +1240,12 @@ js_addbuf_number_(struct __jbuf * jbuf, unsigned int num)
 static int
 js_number_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 {
-    if (lz_likely(json->type != lz_json_vtype_number))
+    if (json->type != lz_json_vtype_number)
     {
         return -1;
-    } else {
-        return js_addbuf_number_(jbuf, json->number);
     }
+
+    return js_addbuf_number_(jbuf, json->number);
 }
 
 static int
@@ -1261,14 +1265,14 @@ js_escape_string_(const char * str, size_t len, struct __jbuf * jbuf)
 
         switch (ch) {
             default:
-                if (lz_unlikely(js_addbuf_(jbuf, (const char *)&ch, 1) == -1))
+                if (js_addbuf_(jbuf, (const char *)&ch, 1) == -1)
                 {
                     return -1;
                 }
 
                 break;
             case '\n':
-                if (lz_unlikely(js_addbuf_(jbuf, "\\n", 2) == -1))
+                if (js_addbuf_(jbuf, "\\n", 2) == -1)
                 {
                     return -1;
                 }
@@ -1281,19 +1285,19 @@ js_escape_string_(const char * str, size_t len, struct __jbuf * jbuf)
                 }
                 break;
             case '\t':
-                if (lz_unlikely(js_addbuf_(jbuf, "\\t", 2) == -1))
+                if (js_addbuf_(jbuf, "\\t", 2) == -1)
                 {
                     return -1;
                 }
                 break;
             case '\r':
-                if (lz_unlikely(js_addbuf_(jbuf, "\\r", 2) == -1))
+                if (js_addbuf_(jbuf, "\\r", 2) == -1)
                 {
                     return -1;
                 }
                 break;
             case '\\':
-                if (lz_unlikely(js_addbuf_(jbuf, "\\\\", 2) == -1))
+                if (js_addbuf_(jbuf, "\\\\", 2) == -1)
                 {
                     return -1;
                 }
@@ -1333,7 +1337,7 @@ js_string_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 
     if (jbuf->escape == true)
     {
-        if (lz_unlikely(js_escape_string_(str, json->slen, jbuf) == -1))
+        if (js_escape_string_(str, json->slen, jbuf) == -1)
         {
             return -1;
         }
@@ -1394,7 +1398,7 @@ js_array_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 
     array = json->array;
 
-    if (lz_unlikely(js_addbuf_(jbuf, "[", 1) == -1))
+    if (js_addbuf_(jbuf, "[", 1) == -1)
     {
         return -1;
     }
@@ -1408,21 +1412,21 @@ js_array_to_buffer_(lz_json * json, struct __jbuf * jbuf)
             return -1;
         }
 
-        if (lz_unlikely(js_json_to_buffer_(val, jbuf) == -1))
+        if (js_json_to_buffer_(val, jbuf) == -1)
         {
             return -1;
         }
 
         if ((temp = lz_tailq_next(elem)))
         {
-            if (lz_unlikely(js_addbuf_(jbuf, ",", 1) == -1))
+            if (js_addbuf_(jbuf, ",", 1) == -1)
             {
                 return -1;
             }
         }
     }
 
-    if (lz_unlikely(js_addbuf_(jbuf, "]", 1) == -1))
+    if (js_addbuf_(jbuf, "]", 1) == -1)
     {
         return -1;
     }
@@ -1827,6 +1831,19 @@ js_compare_(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb)
             return -1;
     }
 
+    return 0;
+}
+
+int
+lz_json_init(void)
+{
+    if (lz_unlikely(__js_heap == NULL))
+    {
+        if (!(__js_heap = lz_heap_new(sizeof(lz_json), 1024)))
+        {
+            return -1;
+        }
+    }
     return 0;
 }
 
