@@ -342,7 +342,7 @@ js_array_add_(lz_json * dst, lz_json * src)
         return -1;
     }
 
-    if (lz_unlikely(dst->type != lz_json_vtype_array))
+    if (dst->type != lz_json_vtype_array)
     {
         return -1;
     }
@@ -504,6 +504,7 @@ js_parse_boolean_(const char * data, size_t len, size_t * n_read)
     if (lz_unlikely(len < 4))
     {
         /* need at LEAST 'true' */
+	*n_read = 0;
         return NULL;
     }
 
@@ -573,7 +574,6 @@ js_parse_value_(const char * data, size_t len, size_t * n_read)
 {
     if (data == NULL || len == 0)
     {
-        /* *n_read = 0; */
         return NULL;
     }
 
@@ -1279,7 +1279,7 @@ js_escape_string_(const char * str, size_t len, struct __jbuf * jbuf)
 
                 break;
             case '"':
-                if (lz_unlikely(js_addbuf_(jbuf, "\\\"", 2) == -1))
+                if (js_addbuf_(jbuf, "\\\"", 2) == -1)
                 {
                     return -1;
                 }
@@ -1325,12 +1325,12 @@ js_string_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 
     str = json->string;
 
-    if (lz_unlikely(str == NULL))
+    if ((str = json->string) == NULL) {
     {
         return -1;
     }
 
-    if (lz_unlikely(js_addbuf_(jbuf, "\"", 1) == -1))
+    if (js_addbuf_(jbuf, "\"", 1) == -1)
     {
         return -1;
     }
@@ -1453,7 +1453,7 @@ js_object_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 
     object = json->object;
 
-    if (lz_unlikely(js_addbuf_(jbuf, "{", 1) == -1))
+    if (js_addbuf_(jbuf, "{", 1) == -1)
     {
         return -1;
     }
@@ -1473,7 +1473,7 @@ js_object_to_buffer_(lz_json * json, struct __jbuf * jbuf)
             return -1;
         }
 
-        if (lz_unlikely(js_addbuf_(jbuf, "\"", 1) == -1))
+        if (js_addbuf_(jbuf, "\"", 1) == -1)
         {
             return -1;
         }
