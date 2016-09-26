@@ -8,10 +8,8 @@
 #include <stdarg.h>
 #include <ctype.h>
 
+#include <liblz.h>
 #include <liblz/lzapi.h>
-#include <liblz/lz_tailq.h>
-#include <liblz/lz_kvmap.h>
-#include <liblz/lz_heap.h>
 
 #include "lz_json.h"
 #include "lz_jsonL.h"

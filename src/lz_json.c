@@ -10,10 +10,8 @@
 #include <unistd.h>
 #include <bsd/stdlib.h> /* for reallocf */
 
+#include <liblz.h>
 #include <liblz/lzapi.h>
-#include <liblz/lz_tailq.h>
-#include <liblz/lz_kvmap.h>
-#include <liblz/lz_heap.h>
 
 #include "lz_json.h"
 
@@ -69,8 +67,8 @@ struct lz_json_s {
 static lz_json * js_parse_value_(const char *, size_t, size_t *);
 static int       js_compare_(lz_json *, lz_json *, lz_json_key_filtercb);
 
-static int       js_json_to_buffer_(lz_json * json, struct __jbuf * jbuf);
-static int       js_addbuf_(struct __jbuf * jbuf, const char * buf, size_t len);
+static int js_json_to_buffer_(lz_json * json, struct __jbuf * jbuf);
+static int js_addbuf_(struct __jbuf * jbuf, const char * buf, size_t len);
 
 #define JS_STATIC_GET_FNDEF(return_type, return_err, arg_cmp, arg_name) \
     static return_type                                                  \
