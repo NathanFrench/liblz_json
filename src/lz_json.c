@@ -802,7 +802,7 @@ end:
 
     if ((end_ch != '}' || error == true))
     {
-        lz_safe_free(js, js_free);
+        lz_safe_free(js, js_free_);
         return NULL;
     }
 
@@ -1822,11 +1822,11 @@ js_compare_(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb)
         case lz_json_vtype_object:
             return js_object_compare_(j1, j2, cb);
         case lz_json_vtype_string:
-            return _lz_j_string_compare_(j1, j2, cb);
+            return js_string_compare_(j1, j2, cb);
         case lz_json_vtype_bool:
-            return _lz_j_boolean_compare(j1, j2, cb);
+            return js_boolean_compare_(j1, j2, cb);
         case lz_json_vtype_null:
-            return _lz_j_null_compare(j2, j2, cb);
+            return js_null_compare_(j2, j2, cb);
         default:
             return -1;
     }
