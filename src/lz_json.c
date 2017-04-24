@@ -8,7 +8,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <unistd.h>
-#include <bsd/stdlib.h> /* for reallocf */
+#include <stdlib.h> /* for reallocf */
 
 #include <liblz.h>
 #include <liblz/lzapi.h>
@@ -316,13 +316,14 @@ js_object_add_(lz_json * dst, const char * key, lz_json * val)
     {
         return -1;
     }
+}
 
-    if (!lz_kvmap_add(dst->object, key, val, (void (*))lz_json_free))
-    {
-        return -1;
-    }
+if (!lz_kvmap_add(dst->object, key, val, (void (*))lz_json_free))
+{
+    return -1;
+}
 
-    return 0;
+return 0;
 }
 
 static int
@@ -373,13 +374,13 @@ static lz_json *
 js_parse_string_(const char * data, size_t len, size_t * n_read)
 {
     unsigned char ch;
-    size_t        i;
-    size_t        buflen;
-    char          buf[len + 128];
-    int           buf_idx;
-    int           escaped;
-    bool          error;
-    lz_json     * js;
+    size_t i;
+    size_t buflen;
+    char buf[len + 128];
+    int buf_idx;
+    int escaped;
+    bool error;
+    lz_json * js;
 
     if (!data || !len || *data != '"')
     {
@@ -469,10 +470,10 @@ static lz_json *
 js_parse_number_(const char * data, size_t len, size_t * n_read)
 {
     unsigned char ch;
-    char          buf[len];
-    int           buf_idx;
-    size_t        i;
-    lz_json     * js;
+    char buf[len];
+    int buf_idx;
+    size_t i;
+    lz_json * js;
 
     if (!data || !len)
     {
@@ -586,13 +587,13 @@ js_parse_null_(const char * data, size_t len, size_t * n_read)
 static lz_json *
 js_parse_array_(const char * data, size_t len, size_t * n_read)
 {
-    unsigned char  ch;
-    unsigned char  end_ch;
-    size_t         i;
-    bool           error;
-    size_t         b_read;
+    unsigned char ch;
+    unsigned char end_ch;
+    size_t i;
+    bool error;
+    size_t b_read;
     lz_j_arr_state state;
-    lz_json      * js;
+    lz_json * js;
 
 
     if (!data || !len || *data != '[')
@@ -682,15 +683,15 @@ end:
 static lz_json *
 js_parse_object_(const char * data, size_t len, size_t * n_read)
 {
-    unsigned char  ch;
-    unsigned char  end_ch;
-    size_t         i;
-    lz_json      * js;
-    lz_json      * key;
-    lz_json      * val;
+    unsigned char ch;
+    unsigned char end_ch;
+    size_t i;
+    lz_json * js;
+    lz_json * key;
+    lz_json * val;
     lz_j_obj_state state;
-    bool           error;
-    size_t         b_read;
+    bool error;
+    size_t b_read;
 
     if (*data != '{')
     {
@@ -813,10 +814,10 @@ static lz_json *
 js_parse_buf_(const char * data, size_t len, size_t * n_read)
 {
     unsigned char ch;
-    size_t        b_read;
-    size_t        i;
-    lz_json     * js;
-    lz_j_state    state;
+    size_t b_read;
+    size_t i;
+    lz_json * js;
+    lz_j_state state;
 
     js     = NULL;
     b_read = 0;
@@ -874,11 +875,11 @@ js_parse_buf_(const char * data, size_t len, size_t * n_read)
 static lz_json *
 js_parse_file_(const char * filename, size_t * bytes_read)
 {
-    lz_json * json   = NULL;
-    FILE    * fp     = NULL;
-    char    * buf    = NULL;
-    size_t    n_read = 0;
-    long      file_size;
+    lz_json * json = NULL;
+    FILE * fp      = NULL;
+    char * buf     = NULL;
+    size_t n_read  = 0;
+    long file_size;
 
     if (filename == NULL)
     {
@@ -967,12 +968,12 @@ enum path_state {
 static lz_json *
 js_get_path_(lz_json * js, const char * path)
 {
-    char            buf[strlen(path) + 1];
-    int             buf_idx;
-    lz_kvmap      * object;
-    lz_json       * prev;
-    unsigned char   ch;
-    size_t          i;
+    char buf[strlen(path) + 1];
+    int buf_idx;
+    lz_kvmap * object;
+    lz_json * prev;
+    unsigned char ch;
+    size_t i;
     enum path_state state;
 
     if (lz_unlikely(js == NULL || path == NULL))
@@ -1082,7 +1083,7 @@ static int
 js_addbuf_vprintf_(struct __jbuf * jbuf, const char * fmt, va_list ap)
 {
     char tmpbuf[jbuf->buf_len - jbuf->buf_idx];
-    int  sres;
+    int sres;
 
     if (lz_unlikely(jbuf == NULL))
     {
@@ -1103,7 +1104,7 @@ static int
 js_addbuf_printf_(struct __jbuf * jbuf, const char * fmt, ...)
 {
     va_list ap;
-    int     sres;
+    int sres;
 
     if (lz_unlikely(jbuf == NULL))
     {
@@ -1169,10 +1170,10 @@ static const char digits[] =
 static int
 js_addbuf_number_(struct __jbuf * jbuf, unsigned int num)
 {
-    char     buf[32]; /* 18446744073709551615 64b, 20 characters */
-    char   * buffer          = (char *)buf;
-    char   * buffer_end      = buffer + 32;
-    char   * buffer_end_save = buffer + 32;
+    char buf[32];     /* 18446744073709551615 64b, 20 characters */
+    char * buffer          = (char *)buf;
+    char * buffer_end      = buffer + 32;
+    char * buffer_end_save = buffer + 32;
     unsigned index;
 
     if (lz_unlikely(jbuf == NULL))
@@ -1220,7 +1221,7 @@ static int
 js_escape_string_(const char * str, size_t len, struct __jbuf * jbuf)
 {
     unsigned char ch;
-    size_t        i;
+    size_t i;
 
     if (lz_unlikely(str == NULL || jbuf == NULL))
     {
@@ -1350,7 +1351,7 @@ js_null_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 static int
 js_array_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 {
-    lz_tailq      * array;
+    lz_tailq * array;
     lz_tailq_elem * elem;
     lz_tailq_elem * temp;
 
@@ -1405,7 +1406,7 @@ js_array_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 static int
 js_object_to_buffer_(lz_json * json, struct __jbuf * jbuf)
 {
-    lz_kvmap     * object;
+    lz_kvmap * object;
     lz_kvmap_ent * ent;
     lz_kvmap_ent * temp;
 
@@ -1429,7 +1430,7 @@ js_object_to_buffer_(lz_json * json, struct __jbuf * jbuf)
     for (ent = lz_kvmap_first(object); ent; ent = temp)
     {
         const char * key;
-        lz_json    * val;
+        lz_json * val;
 
         if (!(key = lz_kvmap_ent_key(ent)))
         {
@@ -1612,11 +1613,11 @@ js_number_compare_(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb)
 static int
 js_array_compare_(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb)
 {
-    lz_tailq      * j1_array;
-    lz_tailq      * j2_array;
+    lz_tailq * j1_array;
+    lz_tailq * j2_array;
     lz_tailq_elem * elem;
     lz_tailq_elem * temp;
-    int             idx;
+    int idx;
 
     if (j1 == NULL || j2 == NULL)
     {
@@ -1669,8 +1670,8 @@ js_array_compare_(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb)
 static int
 js_object_compare_(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb)
 {
-    lz_kvmap     * j1_map;
-    lz_kvmap     * j2_map;
+    lz_kvmap * j1_map;
+    lz_kvmap * j2_map;
     lz_kvmap_ent * ent;
     lz_kvmap_ent * temp;
 
@@ -1692,8 +1693,8 @@ js_object_compare_(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb)
     for (ent = lz_kvmap_first(j1_map); ent; ent = temp)
     {
         const char * key;
-        lz_json    * j1_val;
-        lz_json    * j2_val;
+        lz_json * j1_val;
+        lz_json * j2_val;
 
         if (!(key = lz_kvmap_ent_key(ent)))
         {
