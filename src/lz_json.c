@@ -1874,9 +1874,6 @@ lz_alias(js_object_add_klen_, lz_json_object_add_klen);
 lz_alias(js_object_add_, lz_json_object_add);
 lz_alias(js_array_add_, lz_json_array_add);
 lz_alias(js_add_, lz_json_add);
-
-
 lz_alias(js_to_buffer_alloc_, lz_json_to_buffer_alloc);
 lz_alias(js_to_buffer_, lz_json_to_buffer);
-
 lz_alias(js_compare_, lz_json_compare);

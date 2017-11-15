@@ -1,5 +1,4 @@
-#ifndef __LZ_JSON_H__
-#define __LZ_JSON_H__
+#pragma once
 
 enum lz_json_vtype_e {
     lz_json_vtype_string = 0,
@@ -342,6 +341,3 @@ LZ_EXPORT char * lz_json_to_buffer_alloc(lz_json * json, size_t * len);
  * @return
  */
 LZ_EXPORT int lz_json_compare(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb);
-
-#endif
-
