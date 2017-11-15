@@ -14,7 +14,7 @@ struct lz_json_s;
 typedef enum lz_json_vtype_e lz_json_vtype;
 typedef struct lz_json_s     lz_json;
 
-typedef int (*lz_json_key_filtercb)(const char * key, lz_json * val);
+typedef int (* lz_json_key_filtercb)(const char * key, lz_json * val);
 
 
 /**
@@ -341,3 +341,5 @@ LZ_EXPORT char * lz_json_to_buffer_alloc(lz_json * json, size_t * len);
  * @return
  */
 LZ_EXPORT int lz_json_compare(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb);
+
+LZ_EXPORT int lz_json_init(void);
