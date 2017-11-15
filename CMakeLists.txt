@@ -4,7 +4,9 @@ include_directories (${CMAKE_BINARY_DIR}/include)
 include_directories (${CMAKE_BINARY_DIR}/include/liblz)
 link_directories    (${CMAKE_BINARY_DIR}/lib)
 
-find_library (LIBLZ_CORE lz_core)
+find_library (LIBLZ_CORE lz_core REQUIRED)
+include_directories(${LIBLZ_CORE_INCLUDE_DIRECTORIES})
+
 message      (STATUS "lzcore: ${LIBLZ_CORE}")
 
 find_library (LIBLUA
