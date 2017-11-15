@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
+# stuff
+
 include_directories (${CMAKE_BINARY_DIR}/include)
 include_directories (${CMAKE_BINARY_DIR}/include/liblz)
 link_directories    (${CMAKE_BINARY_DIR}/lib)
