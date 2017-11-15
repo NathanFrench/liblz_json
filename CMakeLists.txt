@@ -5,7 +5,7 @@ include_directories (${CMAKE_BINARY_DIR}/include/liblz)
 link_directories    (${CMAKE_BINARY_DIR}/lib)
 
 find_library (LIBLZ_CORE lz_core REQUIRED)
-find_path    (LIBLZ_CORE_PATH liblz.h)
+find_path    (LIBLZ_CORE_PATH liblz.h REQUIRED)
 
 include_directories(${LIBLS_CORE_PATH})
 
