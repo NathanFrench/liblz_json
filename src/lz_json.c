@@ -8,8 +8,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <unistd.h>
-#include <stdlib.h>     /* for reallocf */
-#include <bsd/stdlib.h> /* for reallocf */
+#include <stdlib.h>
 
 #include <liblz.h>
 #include <liblz/lzapi.h>
@@ -1138,7 +1137,7 @@ js_addbuf_(struct __jbuf * jbuf, const char * buf, size_t len)
         if (jbuf->dynamic == 1)
         {
             /* give daddy a little more memory, just one memory */
-            jbuf->buf = reallocf(jbuf->buf, (size_t)(jbuf->buf_len + len + 32));
+            jbuf->buf = realloc(jbuf->buf, (size_t)(jbuf->buf_len + len + 32));
 
             if (lz_unlikely(jbuf->buf == NULL))
             {
