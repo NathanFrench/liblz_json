@@ -342,4 +342,4 @@ LZ_EXPORT char * lz_json_to_buffer_alloc(lz_json * json, size_t * len);
  */
 LZ_EXPORT int lz_json_compare(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb);
 
-LZ_EXPORT int lz_json_init(void);
+LZ_EXPORT int lz_json_init(void) __attribute__((constructor(101));
