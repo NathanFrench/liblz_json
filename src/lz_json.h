@@ -239,7 +239,7 @@ LZ_EXPORT ssize_t lz_json_get_size(lz_json * js);
  *
  * @return
  */
-LZ_EXPORT lz_json * lz_json_path_get(lz_json * js, const char * path);
+LZ_EXPORT lz_json * lz_json_get_path(lz_json * js, const char * path);
 
 
 /**
