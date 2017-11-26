@@ -335,7 +335,7 @@ LZ_EXPORT char * lz_json_to_buffer_alloc(lz_json * json, size_t * len);
  * @param [IN]  json encoded structure
  *
  */
-LZ_EXPORT void lz_json_print(FILE * out, lz_Json * json);
+LZ_EXPORT void lz_json_print(FILE * out, lz_json * json);
 
 /**
  * @brief compares two lz_json contexts to determine if they match, if the filtercb
