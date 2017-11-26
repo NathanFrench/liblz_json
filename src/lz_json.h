@@ -329,6 +329,15 @@ LZ_EXPORT char * lz_json_to_buffer_alloc(lz_json * json, size_t * len);
 
 
 /**
+ * @brief prints string version of json context
+ *
+ * @param [OUT] output file pointer
+ * @param [IN]  json encoded structure
+ *
+ */
+LZ_EXPORT void lz_json_print(FILE * out, lz_Json * json);
+
+/**
  * @brief compares two lz_json contexts to determine if they match, if the filtercb
  *        argument is not NULL, and the type being compared currently is an array or object,
  *        each ts_json context is passed to the callback. If the callback returns -1, that

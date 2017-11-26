@@ -1582,6 +1582,21 @@ js_to_buffer_alloc_(lz_json * json, size_t * len)
     return jbuf.buf;
 }
 
+static void
+js_print_(FILE * out, lz_json * json) {
+    size_t len;
+    char * buf;
+
+    if ((buf = js_to_buffer_alloc_(json, &len)) == NULL) {
+        fprintf(out, "{\"error\":%d}\n", len);
+        return;
+    }
+
+    fprintf(out, "%s\n", buf);
+
+    free(buf);
+}
+
 static int
 js_number_compare_(lz_json * j1, lz_json * j2, lz_json_key_filtercb cb)
 {
@@ -1876,3 +1891,4 @@ lz_alias(js_add_, lz_json_add);
 lz_alias(js_to_buffer_alloc_, lz_json_to_buffer_alloc);
 lz_alias(js_to_buffer_, lz_json_to_buffer);
 lz_alias(js_compare_, lz_json_compare);
+lz_alias(js_print_, ls_json_print);
