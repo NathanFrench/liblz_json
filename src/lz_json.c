@@ -1891,4 +1891,4 @@ lz_alias(js_add_, lz_json_add);
 lz_alias(js_to_buffer_alloc_, lz_json_to_buffer_alloc);
 lz_alias(js_to_buffer_, lz_json_to_buffer);
 lz_alias(js_compare_, lz_json_compare);
-lz_alias(js_print_, ls_json_print);
+lz_alias(js_print_, lz_json_print);
