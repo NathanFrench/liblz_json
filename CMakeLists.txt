@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 # stuff
 
-include_directories (${LIBLZ_CORE_PATH})
-include_directories (${LIBLZ_CORE_PATH}/liblz)
+include_directories (${LIBLZ_CORE_PATH}/include)
+include_directories (${LIBLZ_CORE_PATH}/include/liblz)
 link_directories    (${LIBLZ_CORE_PATH}/lib)
 
 find_library (LIBLZ_CORE      lz_core REQUIRED)
