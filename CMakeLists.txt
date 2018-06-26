@@ -2,14 +2,12 @@ cmake_minimum_required(VERSION 2.8)
 
 # stuff
 
-include_directories (${PROJECT_BINARY_DIR}/include)
-include_directories (${PROJECT_BINARY_DIR}/include/liblz)
-link_directories    (${PROJECT_BINARY_DIR}/lib)
+include_directories (${LIBLZ_CORE_PATH})
+include_directories (${LIBLZ_CORE_PATH}/liblz)
+link_directories    (${LIBLZ_CORE_PATH}/lib)
 
 find_library (LIBLZ_CORE      lz_core REQUIRED)
 find_path    (LIBLZ_CORE_PATH liblz.h REQUIRED)
-
-include_directories(${LIBLZ_CORE_PATH})
 
 message      (STATUS "lzcore: ${LIBLZ_CORE}")
 
